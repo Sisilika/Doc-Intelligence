@@ -1,31 +1,38 @@
+import os
 import requests
-import streamlit as st
+from dotenv import load_dotenv
 
+load_dotenv()
+
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+
+print("KEY LOADED:", OPENROUTER_API_KEY[:10] if OPENROUTER_API_KEY else "NONE")
 def ask_llm(prompt):
+    url = "https://openrouter.ai/api/v1/chat/completions"
 
-    key = st.secrets["OPENROUTER_API_KEY"]
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json"
+    }
 
-    response = requests.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-        headers={
-            "Authorization": f"Bearer {key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://doc-intelligence-esa5ngepmuwfw6x3ukyytu.streamlit.app",
-            "X-Title": "Doc Intelligence"
-        },
-        json={
-            "model": "mistralai/mixtral-8x7b-instruct",
-            "messages": [
-                {"role": "system", "content": "You answer using only provided document context."},
-                {"role": "user", "content": prompt}
-            ]
-        }
-    )
+    data = {
+        "model": "mistralai/mixtral-8x7b-instruct",
+        "messages": [
+            {"role": "system", "content": "You answer using only provided document context."},
+            {"role": "user", "content": prompt}
+        ]
+    }
 
-    print("STATUS:", response.status_code)
-    print("BODY:", response.text)
+    response = requests.post(url, headers=headers, json=data)
 
-    if response.status_code != 200:
-        return response.text
+    print("\n========== OPENROUTER RAW RESPONSE ==========")
+    print(response.text)
+    print("============================================\n")
 
-    return response.json()["choices"][0]["message"]["content"]
+    resp_json = response.json()
+
+    if "choices" not in resp_json:
+        return str(resp_json)
+
+    return resp_json["choices"][0]["message"]["content"]
+print("KEY LOADED:", OPENROUTER_API_KEY[:10] if OPENROUTER_API_KEY else "NONE")
