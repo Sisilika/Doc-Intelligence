@@ -4,6 +4,7 @@ import streamlit as st
 OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
 
 def ask_llm(prompt):
+    print("SECRET EXISTS:", bool(OPENROUTER_API_KEY))
 
     url = "https://openrouter.ai/api/v1/chat/completions"
 
