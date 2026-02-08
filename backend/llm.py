@@ -1,18 +1,17 @@
-import os
 import requests
-from dotenv import load_dotenv
+import streamlit as st
 
-load_dotenv()
+OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
 
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-
-print("KEY LOADED:", OPENROUTER_API_KEY[:10] if OPENROUTER_API_KEY else "NONE")
 def ask_llm(prompt):
+
     url = "https://openrouter.ai/api/v1/chat/completions"
 
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://doc-intelligence.streamlit.app",
+        "X-Title": "Doc Intelligence"
     }
 
     data = {
@@ -25,14 +24,9 @@ def ask_llm(prompt):
 
     response = requests.post(url, headers=headers, json=data)
 
-    print("\n========== OPENROUTER RAW RESPONSE ==========")
-    print(response.text)
-    print("============================================\n")
-
     resp_json = response.json()
 
     if "choices" not in resp_json:
         return str(resp_json)
 
     return resp_json["choices"][0]["message"]["content"]
-print("KEY LOADED:", OPENROUTER_API_KEY[:10] if OPENROUTER_API_KEY else "NONE")
