@@ -1,6 +1,9 @@
 import streamlit as st
 import json
 import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from backend.rag_pipeline import (
     load_document,
